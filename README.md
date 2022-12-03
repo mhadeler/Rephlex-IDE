@@ -1,5 +1,5 @@
 # Rephlex-IDE
-This is an Google Apps Script code editor/IDE that connects directly to your Google drive for loading and saving files. It creates
+This is a Google Apps Script code editor/IDE that connects directly to your Google drive for loading and saving files. It creates
 unique query strings for rach file, allowing files to be saved and opened as bookmarks.
 
 This tool uses the CodeMirror library for the actual editor portion, providing the markup and editing functions of the editor. I've 
