@@ -11,7 +11,8 @@ This is very much a WYSIWYG editor. It currently provides markup support for:
 - JS
 - XML
 
-This is all done through the CodeMirror library and many other languages can be added. Check out their documentation for more info.
+This is all done through the CodeMirror library and many other languages can be added. Check out their documentation for more info. 
+Similarly, there are tons of other themes to choose from. I only use dark mode themes.
 
 To deploy:
 
