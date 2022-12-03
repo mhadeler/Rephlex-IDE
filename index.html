@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  
+  <title>Rephlex Editor</title>
+
+  <?!= include("css");  ?>
+  <?!= include("cm-search-interface-css");  ?>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous"/> 
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+
+  <!-----------------------------------------------Main---------------------------------------------->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/codemirror.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/codemirror.css">
+  
+  <!-----------------------------------------------Modes---------------------------------------------->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/javascript/javascript.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/htmlmixed/htmlmixed.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/xml/xml.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/mode/css/css.js"></script>
+  
+  <!-----------------------------------------------Addons---------------------------------------------->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/addon/edit/matchbrackets.js"></script>
+  <?!= include("cm-search-interface-js"); ?>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/addon/search/search.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/addon/search/searchcursor.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/addon/dialog/dialog.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/addon/dialog/dialog.css">
+
+  <link rel="stylesheet" href="https://codemirror.net/5/addon/search/matchesonscrollbar.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/addon/search/matchesonscrollbar.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/addon/scroll/annotatescrollbar.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/addon/scroll/simplescrollbars.js"></script>  
+  
+  <!-----------------------------------------------Themes---------------------------------------------->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/ambiance.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/blackboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/cobalt.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/dracula.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/isotope.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/lucario.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/material.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/midnight.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/seti.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/shadowfox.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/the-matrix.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/vibrant-ink.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.3/theme/yonce.css"> 
+
+</head>
+
+<body>
+
+  <div class="mainContainer">
+
+    <div class="buttonDiv flex-row">
+      
+      <div class="leftGroup flex-row">
+        <select id="modeSelect">
+          <option value="Mode" disabled>Mode</option>
+          <option value="htmlmixed" selected>HTML Mixed</option>
+          <option value="javascript">Javascript</option>
+          <option value="css">CSS</option>
+          <option value="xml">XML</option>      
+        </select>
+
+        <div class="flex-row">
+          <h2 class="toolname">Rephlex Editor</h2>
+          <h3 id="fileName"></h3>
+        </div>
+      </div>
+
+      <select id="themeSelect">
+        <option value="Theme" disabled>Theme</option>
+        <option value="ambiance">Ambiance</option>
+        <option value="blackboard">Blackboard</option>
+        <option value="cobalt">Cobalt</option>
+        <option value="dracula">Dracula</option>
+        <option value="isotope">Isotope</option>
+        <option value="lucario">Lucario</option>
+        <option value="material" selected>Material</option>
+        <option value="midnight">Midnight</option>
+        <option value="seti">Seti</option>
+        <option value="shadowfox">Shadowfox</option>
+        <option value="the-matrix">The Matrix</option>
+        <option value="vibrant-ink">Vibrant Ink</option>
+        <option value="yonce">Yonce</option>
+      </select>
+
+    </div>
+
+    <flex class="contentDiv flex-row h">
+
+      <flex-item class="editorContainer" style="flex: 4">
+        <div class="textBox" id="editor">
+          <textarea id="tb"></textarea>
+        </div>
+      </flex-item>
+
+      <flex-resizer id="dividerTemp" ondblclick="toggleNavBar()"></flex-resizer>
+
+      <flex-item id="navDiv" style="flex: 1">
+        <div class="upperButtonsDiv">
+          <button id="upButton">Up</button>
+          <h3 id="folderName"></h3>
+        </div>
+
+        <div id="itemsDiv">
+        </div>
+        <div class="loaderContainer" style="display:none">
+          <div class="loader"></div>
+        </div>
+
+        <div class="lowerNavDiv">
+          <div class="buttonContainer">
+            <div class="lowerButtonsDiv">
+              <button id="openButton" class="lowerButton">Open</button>
+              <button onclick="saveButton()" class="lowerButton">Save</button>
+              <button onclick="saveAsButton()" class="lowerButton">Save As</button>
+              <button onclick="newFolder()" class="lowerButton">New Folder</button>
+            </div>
+            <button class="lowerButton single" onclick="directLink()">Open in New Window</button>
+          </div>
+        </div>
+    </flex-item>
+
+  </flex>
+</div>
+
+
+
+<?!= "<script> var initType = "+JSON.stringify(initType)+"; var initID = "+JSON.stringify(initID)+"; var hierarchy = "+JSON.stringify(hierarchy)+";</script>" ?>
+<?!= include("js");  ?>
+
+</body>
+</html>
