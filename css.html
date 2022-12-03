@@ -1,0 +1,285 @@
+<style>
+
+html {
+  height: 100%;
+  font-family: 'Montserrat'; //'Poppins', sans-serif;
+}
+
+body {
+  background-color: #1f1f1f;
+  height: 100%;
+  margin: 0px 20px;
+}
+
+.mainContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;  
+}
+
+button, select {
+  width: 100px;
+  height: 30px;
+  background-color: #263238;
+  color: #aaa;
+  min-width: 85px;
+  max-width: 150px;
+  border-radius: 10px;
+  font-family: 'Montserrat';
+  white-space: nowrap;
+  border: 1px solid;
+}
+
+h2.toolname {
+    font-family: 'Montserrat';
+    color: #aaa;
+    margin: 0px 30px;
+    padding-right: 0px;
+    font-size: 30px;
+    font-style: oblique;
+    font-weight: 300;
+    letter-spacing: -3px;  
+}
+
+h5, h3 {
+  padding: 0px;
+  margin: 0px;
+  color: gray;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 10px; 
+}
+
+#folderName {
+  color: #ccc;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.buttonDiv {
+  height: 2%;
+  justify-content: space-between;
+}
+
+.buttonDiv select {
+    width: 140px;
+}
+
+.contentDiv {
+  height: 92%;
+  border: 1px solid #777;
+  box-sizing: border-box;
+  border-radius: 10px;
+  overflow: hidden;  
+}
+
+div.contentDiv > div {
+  height: 100%;
+}
+
+.editorContainer {
+  height: 100%;
+}
+
+.textBox {
+  height: 100%;
+}
+
+#divider {
+  background-color: #111111;
+  width: 20px;
+}   
+
+#navDiv {
+  background-color: #555;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#itemsDiv {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 100%;
+  background-color: #2a2a2a;
+  border: 1px solid #777;
+  box-sizing: border-box;
+}
+
+.item {
+  width: 100%;
+  height: 30px;
+  display: flex;
+  align-items: center;  
+  user-select: none;
+}
+
+.item > h3 {
+  color: #888;
+}
+
+.item.folder > h3 {
+  color: #eee;
+}
+
+.item.active {
+  background-color: #444;
+}
+
+.upperButtonsDiv {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: #555;
+  padding: 5px;
+}
+
+
+.lowerNavDiv {
+  padding: 5px;
+}
+
+.lowerButtonsDiv {
+  display: flex;
+  flex-direction: row;
+}
+
+.lowerButton {
+  width: 100%;
+  margin: 0px;
+}
+
+.lowerButton.single {
+  min-width: 340px;
+  max-width: 600px;
+}
+    
+.CodeMirror {
+  height: auto;
+}
+.CodeMirror-scroll {
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+
+
+.noTransition {
+  transition: none !important;
+}
+
+flex.h {
+    flex-direction: row;
+}
+
+flex.v {
+    flex-direction: column;
+}
+
+flex-item {
+	overflow: hidden;
+  transition: flex 0.7s;
+}
+
+flex > flex-resizer {
+  flex: 0 0 20px;
+	background-color: #444;
+	background-repeat: no-repeat;
+  background-position: center;
+  height: 100%;
+  border: 1px solid #666;
+}
+
+flex.h > flex-resizer {
+	cursor: ew-resize;
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='30'><path d='M2 0 v30 M5 0 v30 M8 0 v30' fill='none' stroke='black'/></svg>");
+}
+
+flex.v > flex-resizer {
+	cursor: ns-resize;
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='10'><path d='M0 2 h30 M0 5 h30 M0 8 h30' fill='none' stroke='black'/></svg>");
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid red;
+    border-right: 16px solid green;
+    border-bottom: 16px solid blue;
+    border-left: 16px solid purple;
+    width: 100px;
+    height: 100px;
+    animation: spin 2s linear infinite;
+}
+
+.loaderContainer {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2a2a2a;
+}
+
+
+
+
+.cm-s-material div.CodeMirror-selected {
+  background: rgb(0 106 125) !important;
+}
+
+.cm-searching {
+  background-color: rgb(255 255 0 / 40%) !important;
+  color: black !important;
+}
+
+.CodeMirror-sizer {
+  transition: margin-top 1s;
+}
+
+.CodeMirror-overlayscroll .CodeMirror-scrollbar-filler, .CodeMirror-overlayscroll .CodeMirror-gutter-filler {
+  display: none;
+}
+
+.CodeMirror-overlayscroll-horizontal div, .CodeMirror-overlayscroll-vertical div {
+  position: absolute;
+  background: #5f6b76;
+  border-radius: 3px;
+}
+
+.CodeMirror-overlayscroll-horizontal, .CodeMirror-overlayscroll-vertical {
+  position: absolute;
+  z-index: 6;
+}
+
+.CodeMirror-overlayscroll-horizontal {
+  bottom: 0; left: 0;
+  height: 6px;
+}
+.CodeMirror-overlayscroll-horizontal div {
+  bottom: 0;
+  height: 100%;
+}
+
+.CodeMirror-overlayscroll-vertical {
+  right: 0; top: 0;
+  width: 10px;
+}
+.CodeMirror-overlayscroll-vertical div {
+  right: 0;
+  width: 100%;
+}
+
+
+
+</style>
