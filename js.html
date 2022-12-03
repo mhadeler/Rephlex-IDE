@@ -1,0 +1,589 @@
+<script>
+
+  var selectedIndex;
+  var openedFile = false;
+  var lastSaveTime;
+  var savedVersion;
+  var file;
+
+  var textBox = document.getElementById("editor");
+  var navDiv = document.getElementById("navDiv");
+
+	//Codemirror CDN: https://cdnjs.com/libraries/codemirror
+  //Codemirror Manual: https://codemirror.net/doc/manual.html
+	var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("tb"), {
+		lineNumbers: true,
+    theme: "material",
+    lineWrapping: true,
+    mode: "htmlmixed",
+    viewportMargin: Infinity,
+    matchBrackets: true,
+    scrollbarStyle: "overlay"
+	});
+
+  myCodeMirror.setSize("100%", "100%");
+  myCodeMirror.on("change", function(cm, change){
+    if (change.origin != "setValue") {
+      var items = document.getElementsByClassName("item");
+      for (var i=0; i<items.length; i++) {
+        if (file.file_name && items[i].innerText.includes(file.file_name) && !items[i].innerText.includes("*")) {
+          items[i].children[0].innerText = "* " + items[i].children[0].innerText;
+        }
+      }
+    }
+  })  
+
+  if (initType == "folder") {
+    parseHierarchy();
+  } else if (initType == "file") {
+    google.script.run.withSuccessHandler(openFile).open(initID);
+    openedFile = true;
+    parseHierarchy();
+  } else {
+    parseHierarchy();
+  }
+
+  function directLink() {
+    var url = "https://script.google.com/a/macros/google.com/s/AKfycbxDuocXKkJMWB10cGVWHJaSRvDcbl-7BmWK7hdGIaOHMLiHlSZOfE6S/exec";
+    url += "?type=" + hierarchy.item_list[selectedIndex].type + "&id=" + hierarchy.item_list[selectedIndex].id; 
+    window.open(url);
+  }
+  
+
+  document.getElementById("upButton").onclick = function() {
+    google.script.run.withSuccessHandler(parseHierarchy).getHierarchy(hierarchy.parent_folder_id);
+    toggleLoader(true);
+  } 
+
+  document.getElementById("openButton").onclick = openButton;
+  
+  function openButton() {
+    toggleLoader(true);
+    if (hierarchy.item_list[selectedIndex]["type"]=="file") {
+      google.script.run.withSuccessHandler(openFile).open(hierarchy.item_list[selectedIndex]["id"]);
+    } else {
+      google.script.run.withSuccessHandler(parseHierarchy).getHierarchy(hierarchy.item_list[selectedIndex]["id"]);
+    }
+  }
+
+  function openFile(info) {
+    if (info) {
+      file = info;
+    } else {
+      openNotification("You don't have access to the requested file. Either it does not exist or it has not been shared with you.", {
+        duration: 10000,
+        style: {
+          color: 'red',
+          fontSize: '24px',
+          margin: '5px 20px'
+        }
+      });
+      return
+    }
+    openedFile = true;
+    
+    google.script.history.push({'timestamp': new Date().getTime()}, {'type':'file', 'id':file.file_id});
+    myCodeMirror.setValue(file.text);
+    savedVersion = file.text;
+
+    document.getElementById("fileName").innerText = hierarchy.folder_name + " > " + file.file_name + ((['NONE', 'VIEW', 'COMMENT'].includes(file.access)) ? "  (read only)":"");
+    document.getElementsByTagName("title")[0].innerText = file.file_name;
+
+    switch(file.type) {
+        case "text/javascript":
+          document.getElementById("modeSelect").value = "javascript";
+            myCodeMirror.setOption("mode", "javascript");
+            break;
+        case "text/css":
+          document.getElementById("modeSelect").value = "css";
+            myCodeMirror.setOption("mode", "css");
+            break;
+        case "text/html":
+          document.getElementById("modeSelect").value = "htmlmixed";
+            myCodeMirror.setOption("mode", "htmlmixed");
+            break;
+        case "application/json":
+          document.getElementById("modeSelect").value = "javascript";
+            myCodeMirror.setOption("mode", "javascript");
+            break;
+        case "text/xml":
+          document.getElementById("modeSelect").value = "xml";
+            myCodeMirror.setOption("mode", "xml");
+            break;
+        default:
+          document.getElementById("modeSelect").value = "htmlmixed";
+            myCodeMirror.setOption("mode", "htmlmixed");                
+            break;        
+    }
+
+    if (file.file_name.includes('.gs')) {
+      document.getElementById("modeSelect").value = "javascript";
+      myCodeMirror.setOption("mode", "javascript");
+    }
+    lastSaveTime = new Date().getTime();   
+    toggleLoader(false); 
+  }
+
+
+  function parseHierarchy(data) {
+    if (data) {
+      hierarchy = data;
+    }
+
+    if (!hierarchy || !hierarchy.folder_name) {
+      document.getElementById("folderName").innerText = "Access denied to folder";
+      toggleLoader(false);
+      return
+    }
+
+    document.getElementById("folderName").innerText = hierarchy.folder_name;
+    if (!openedFile) {
+      google.script.history.push({'timestamp': new Date().getTime()}, {'type':'folder', 'id':hierarchy.main_folder});
+    }
+
+    var itemsDiv = document.getElementById("itemsDiv");
+    itemsDiv.innerHTML = "";
+    for (var i=0; i<hierarchy.item_list.length; i++) {
+      var type = hierarchy.item_list[i]["type"];
+      var div = document.createElement("div");
+      div.className = "item";
+      div.index = i;
+      if (type=="folder") {
+        div.classList.add('folder');
+      }
+      div.innerHTML = '<h3>' + hierarchy.item_list[i]["name"] + "</h3>"
+      div.onclick = function() {
+        var allDivs = document.querySelectorAll(".item");
+        for (var item of allDivs) {
+          item.classList.remove('active');
+        }
+        this.classList.add('active');
+        selectedIndex = this.index;
+      }
+      div.ondblclick = function(e) {
+        if (e.ctrlKey) {
+          directLink();
+        } else {
+          openButton();
+        }
+      };      
+      itemsDiv.appendChild(div);
+    }
+    toggleLoader(false);
+  }
+
+
+  function newFolder() {
+    createInputPrompt("Please enter the name of the new folder:", function(folderName, e) {
+      if (!folderName) {
+        newFolder()
+        return
+      }
+      toggleLoader(true);
+      console.log(hierarchy.main_folder);
+      google.script.run.withSuccessHandler(parseHierarchy).newFolder(hierarchy.main_folder, folderName);
+    }, 
+    {
+      closeOnenter: true,
+      style: {
+        color: '#00ff00',
+        fontSize: '16px',
+        margin: '5px 20px'
+      }
+    })
+  }
+
+
+  function clearButton() {
+    createButtonPrompt("Are you sure you want to clear all text?", [
+      {
+        buttonText: "Ok",
+        callback: function() {
+          myCodeMirror.setValue('');
+          document.getElementById("fileName").innerText = "";
+          document.getElementsByTagName("title")[0].innerText = "Rephlex Editor";
+          file.type = undefined;
+          file.file_name = undefined;
+        }
+      },
+      {
+        buttonText: "Cancel",
+        callback: function() {
+          return
+        }
+      }
+    ], 
+    {
+      closeOnenter: true,
+      style: {
+        color: 'orange',
+        fontSize: '16px',
+        margin: '5px 20px'
+      }
+    })
+  }
+
+  function saveButton() {
+    if (file && ['NONE', 'VIEW', 'COMMENT'].includes(file.access)) {
+      createButtonPrompt("You do not have edit access to this file. Do you want to create a copy in your current drive directory?", [
+        {
+          buttonText: "Ok",
+          callback: function() {
+            saveAsButton()
+          }
+        },
+        {
+          buttonText: "Cancel",
+          callback: function() {
+            return
+          }
+        }
+      ], 
+      {
+        closeOnenter: true,
+        style: {
+          color: 'orange',
+          fontSize: '16px',
+          margin: '5px 20px'
+        }
+      })
+    } else if (file.file_name && file.type && file.file_id) {
+        toggleLoader(true);
+        google.script.run.withSuccessHandler(saveSuccess).saveExistingFile(myCodeMirror.getValue(), file.file_name, file.type, file.file_id);
+    } else {
+      saveAsButton();
+    }
+  }
+
+  function saveSuccess(newFile) {
+
+      openNotification("Save Successful!", {
+        duration: 5000,
+        style: {
+          color: '#00ff00',
+          fontSize: '20px',
+          margin: '5px 20px'
+        }
+      });
+      savedVersion = myCodeMirror.getValue();
+      toggleLoader(false);
+
+      if (newFile) {
+        openFile(newFile[0]);
+        parseHierarchy(newFile[1]);
+        return
+      }
+
+      var items = document.getElementsByClassName("item");
+      for (var i=0; i<items.length; i++) {
+        if (items[i].innerText.includes(file.file_name) && items[i].innerText.includes("*")) {
+          items[i].children[0].innerText = items[i].children[0].innerText.substr(2, items[i].children[0].innerText.length-2);
+        }
+      }
+      
+  }
+    
+  function saveAsButton() {
+      createInputPrompt("Please enter the filename, including the file type extension (ex .txt).", function(inputVal, e) {
+        if (!inputVal) {
+          saveAsButton();
+          return
+        }
+        saveAs(inputVal);
+      }, 
+      {
+        closeOnenter: true,
+        style: {
+          color: '#00ff00',
+          fontSize: '16px',
+          margin: '5px 20px'
+        }
+      })
+  }  
+
+  function saveAs(filename) {
+      toggleLoader(true);
+      var name = filename;
+      var type = filename.split(".")[1].toLowerCase();
+      var typeString;
+      switch (type) {
+          case "js":
+              typeString = "text/javascript";
+              break;
+          case "gs":
+              typeString = "text/javascript";
+              break;              
+          case "css":
+              typeString = "text/css";
+              break;
+          case "html":
+              typeString = "text/html";
+              break;
+          case "json":
+              typeString = "application/json";
+              break;
+          case "xml":
+              typeString = "text/xml";
+              break;
+          case "txt":
+              typeString = "text/plain";
+              break;                
+          default:
+              typeString = "text/plain";
+              break;
+      }
+      google.script.run.withSuccessHandler(saveSuccess).saveNewFile(myCodeMirror.getValue(), name, typeString, hierarchy.main_folder);
+  }
+
+  document.getElementsByClassName('CodeMirror')[0].ondrop = function(e) {
+      e.preventDefault();
+      var droppedFile = e.dataTransfer.files[0],
+      reader = new FileReader();
+      reader.readAsText(droppedFile);
+      document.getElementById("fileName").innerText = droppedFile.name;
+      document.getElementsByTagName("title")[0].innerText = droppedFile.name;
+      file.file_name = droppedFile.name;
+      file.type = droppedFile.type;
+      switch(file.type) {
+          case "text/javascript":
+            document.getElementById("modeSelect").value = "javascript";
+              myCodeMirror.setOption("mode", "javascript");
+              break;
+          case "text/css":
+            document.getElementById("modeSelect").value = "css";
+              myCodeMirror.setOption("mode", "css");
+              break;
+          case "text/html":
+            document.getElementById("modeSelect").value = "htmlmixed";
+              myCodeMirror.setOption("mode", "htmlmixed");
+              break;
+          case "application/json":
+            document.getElementById("modeSelect").value = "javascript";
+              myCodeMirror.setOption("mode", "javascript");
+              break;
+          case "text/xml":
+            document.getElementById("modeSelect").value = "xml";
+              myCodeMirror.setOption("mode", "xml");
+              break;
+          default:
+            document.getElementById("modeSelect").value = "htmlmixed";
+              myCodeMirror.setOption("mode", "htmlmixed");                
+              break;        
+      }
+      lastSaveTime = new Date().getTime();
+      setTimeout(function() {myCodeMirror.setCursor(0)}, 100);
+      
+      return false;
+  };    
+  
+  
+  document.getElementById('themeSelect').onchange = function() {
+    var theme = document.getElementById('themeSelect').value;
+      myCodeMirror.setOption("theme", theme);
+  }
+  
+  document.getElementById('modeSelect').onchange = function() {
+    var mode = document.getElementById('modeSelect').value;
+      myCodeMirror.setOption("mode", mode);
+  }
+  
+	window.addEventListener('beforeunload', function (evt){
+        if (savedVersion != myCodeMirror.getValue()) {
+            evt.preventDefault();
+            evt.returnValue = 'You still have unsaved changes. Are you sure you want to leave?';
+            return 'You still have unsaved changes. Are you sure you want to leave?'
+        }
+    });    
+
+
+function manageResize(md, sizeProp, posProp) {
+	var r = md.target;
+
+	var prev = r.previousElementSibling;
+	var next = r.nextElementSibling;
+	if (!prev || !next) {
+		return;
+	}
+
+  prev.classList.add('noTransition');
+  next.classList.add('noTransition');
+
+	md.preventDefault();
+
+	var prevSize = prev[sizeProp];
+	var nextSize = next[sizeProp];
+	var sumSize = prevSize + nextSize;
+	var prevGrow = Number(prev.style.flexGrow);
+	var nextGrow = Number(next.style.flexGrow);
+	var sumGrow = prevGrow + nextGrow;
+	var lastPos = md[posProp];
+
+	function onMouseMove(mm) {
+		var pos = mm[posProp];
+		var d = pos - lastPos;
+		prevSize += d;
+		nextSize -= d;
+		if (prevSize < 0) {
+			nextSize += prevSize;
+			pos -= prevSize;
+			prevSize = 0;
+		}
+		if (nextSize < 0) {
+			prevSize += nextSize;
+			pos += nextSize;
+			nextSize = 0;
+		}
+
+		var prevGrowNew = sumGrow * (prevSize / sumSize);
+		var nextGrowNew = sumGrow * (nextSize / sumSize);
+
+		prev.style.flexGrow = prevGrowNew;
+		next.style.flexGrow = nextGrowNew;
+
+		lastPos = pos;
+	}
+
+	function onMouseUp(mu) {
+		// Change cursor to signal a state's change: stop resizing.
+		const html = document.querySelector('html');
+		html.style.cursor = 'default';
+
+		if (posProp === 'pageX') {
+			r.style.cursor = 'ew-resize'; 
+		} else {
+			r.style.cursor = 'ns-resize';
+		}
+
+    prev.classList.remove('noTransition');
+    next.classList.remove('noTransition');
+		
+		window.removeEventListener("mousemove", onMouseMove);
+		window.removeEventListener("mouseup", onMouseUp);
+	}
+
+	window.addEventListener("mousemove", onMouseMove);
+	window.addEventListener("mouseup", onMouseUp);
+}
+
+function setupResizerEvents() {
+	document.body.addEventListener("mousedown", function (md) {
+
+		// Used to avoid cursor's flickering
+		const html = document.querySelector('html');
+		
+		var target = md.target;
+		if (target.nodeType !== 1 || target.tagName !== "FLEX-RESIZER") {
+			return;
+		}
+		var parent = target.parentNode;
+		var h = parent.classList.contains("h");
+		var v = parent.classList.contains("v");
+		if (h && v) {
+			return;
+		} else if (h) {
+			// Change cursor to signal a state's change: begin resizing on H.
+			target.style.cursor = 'col-resize';
+			html.style.cursor = 'col-resize'; // avoid cursor's flickering
+
+			// use offsetWidth versus scrollWidth to avoid splitter's jump on resize when content overflow.
+			manageResize(md, "offsetWidth", "pageX");
+			
+		} else if (v) {
+			// Change cursor to signal a state's change: begin resizing on V.
+			target.style.cursor = 'row-resize';
+			html.style.cursor = 'row-resize'; // avoid cursor's flickering
+
+			manageResize(md, "offsetHeight", "pageY");
+		}
+	});
+}
+
+setupResizerEvents();
+
+
+function toggleNavBar() {
+  var editor = document.querySelector('flex-item.editorContainer');
+  var navBar = document.querySelector('flex-item#navDiv');
+
+  if (navBar.style.flexGrow<0.1 ) {
+    navBar.style.flexGrow = 1;
+    editor.style.flexGrow = 4;
+  } else {
+    navBar.style.flexGrow = 0;
+    editor.style.flexGrow = 5;
+  }
+}
+
+function toggleLoader(turnOn) {
+  var loader = document.querySelector('.loaderContainer');
+  var items = document.querySelector('#itemsDiv');  
+  if (turnOn) {
+    loader.style.display = 'flex';
+    items.style.display = 'none';
+  } else {
+    loader.style.display = 'none';
+    items.style.display = 'block';
+  }
+}
+
+document.addEventListener("keydown", function(e) {
+  if ((window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)  && e.keyCode == 83) {
+    e.preventDefault();
+    saveButton();
+  }
+}, false);
+
+function createInputPrompt(prompt_text, callback, options) {
+  var fragment = document.createDocumentFragment();
+  var paragraph = fragment.appendChild(document.createElement('p'));
+  paragraph.innerText = prompt_text;
+  if (options && options.style) {
+    for (var attribute of Object.keys(options.style)) {
+      paragraph.style[attribute] = options.style[attribute];
+    }
+  }
+  var input = fragment.appendChild(document.createElement('input'));
+  input.style.margin = '0 0 10px 20px';
+  input.style.border = '1px solid #aaa';
+  input.style.backgroundColor = 'rgb(200, 200, 200, .1)';
+  input.type = 'text';
+  myCodeMirror.openDialog(fragment, callback, options);
+}
+
+function createButtonPrompt(prompt_text, buttonsArray, options) {
+  var fragment = document.createDocumentFragment();
+  var paragraph = fragment.appendChild(document.createElement('p'));
+  paragraph.innerText = prompt_text;
+  if (options && options.style) {
+    for (var attribute of Object.keys(options.style)) {
+      paragraph.style[attribute] = options.style[attribute];
+    }
+  }
+  for (var i=0; i<buttonsArray.length; i++) {
+    var button = fragment.appendChild(document.createElement('button'));
+    button.style.margin = '0 0 10px 20px';
+    button.innerText = buttonsArray[i].buttonText
+  }
+  myCodeMirror.openConfirm(fragment, buttonsArray.map(r => r.callback), options);  
+}
+
+
+function openNotification(text, options) {
+  var fragment = document.createDocumentFragment();
+  var paragraph = fragment.appendChild(document.createElement('p'));
+  paragraph.innerText = text;
+  if (options && options.style) {
+    for (var attribute of Object.keys(options.style)) {
+      paragraph.style[attribute] = options.style[attribute];
+    }
+  }
+  if (typeof options == 'number') {
+    myCodeMirror.openNotification(fragment, {duration: options});  
+  } else {
+    myCodeMirror.openNotification(fragment, options);  
+  }
+}
+
+
+
+</script>
