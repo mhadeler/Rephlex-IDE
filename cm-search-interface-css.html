@@ -1,0 +1,219 @@
+<style>
+
+.searchbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.searchContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.searchField {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 2px;
+}
+
+.searchField > label {
+  width: 75px;
+}
+
+.searchField > input {
+  border: 1px solid #aaa !important;
+  height: 70%;
+}
+
+.searchbar button {
+  margin-left: 5px;
+  border-radius: 0px;
+  width: 45px;
+  min-width: 45px;  
+}
+
+.searchNavButtonDiv {
+  display: flex;
+  margin: 0px 10px;
+}
+
+.searchArrowButton {
+    width: 28px;
+    height: 28px;
+    margin: 0px 5px;
+}
+
+.replaceButtons {
+    width: 50px;
+    margin: 0px 5px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 100;
+    transition: font-weight 0.2s;
+    font-family: 'Montserrat';
+}
+
+.replaceButtons:hover {
+  color: orange;
+  font-weight: 900;
+}
+
+div#searchReplaceIcon {
+  height: 26px;
+  margin: 0px 3px;
+}
+
+div.arrow.up {
+  transform: rotate(270deg);
+  transform-origin: center;
+}
+
+div.arrow.down {
+  transform: rotate(90deg);
+  transform-origin: center;
+}
+
+div.arrow {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+div.arrow::before {
+  content: '';
+  position: relative;
+  width: 50%;
+  height: 50%;
+  left: 3px;
+  border-width: 3px 3px 0 0;
+  border-style: solid;
+  border-color: #fafafa;
+  transition: .2s ease;
+  display: block;
+  transform-origin: 0% 50%;
+  transform: rotate(45deg);
+}
+
+div.searchArrowButton:hover > div.arrow::before {
+  border-color: orange;
+  width: 60%;
+  height: 60%;
+  transform-origin: 20% 40%;
+  left: 2px;
+}
+
+div.searchMenuIcon {
+  content: '';
+  width: 28px;
+  height: 70%;
+  top: 15%;
+  position: relative;
+  box-sizing: border-box;
+  border-width: 3px 0 0 0;
+  border-style: solid;
+  border-color: #fafafa;
+  transition: .2s ease;
+}
+
+div.searchMenuIcon::before {
+    content: '';
+    position: relative;
+    top: calc(50% - 3px);
+    width: 100%;
+    height: 100%;
+    border-width: 3px 0 0 0;
+    border-style: solid;
+    border-color: #fafafa;
+    transition: .2s ease;
+    display: block;
+    transform-origin: 100% 0;
+}
+div.searchMenuIcon::after {
+    content: '';
+    position: relative;
+    width: 100%;
+    height: 100%;
+    bottom: calc(0% + 5px);
+    border-width: 3px 0 0 0;
+    border-style: solid;
+    border-color: #fafafa;
+    transition: .2s ease;
+    display: block;
+    transform-origin: 100% 0;
+}
+
+div#searchReplaceIcon.active > div.searchMenuIcon,
+div#searchReplaceIcon.active > div.searchMenuIcon::before,
+div#searchReplaceIcon.active > div.searchMenuIcon::after {
+  border-color: #3aacd2;
+} 
+
+div#searchReplaceIcon:hover > div.searchMenuIcon,
+div#searchReplaceIcon:hover > div.searchMenuIcon::before,
+div#searchReplaceIcon:hover > div.searchMenuIcon::after {
+  border-color: orange;
+} 
+
+div#searchReplaceIcon:hover > div.searchMenuIcon {
+  transform: scale(0.8);
+}
+
+div.searchReplaceCloseIcon {
+    content: '';
+    width: 28px;
+    height: 28px;
+    position: relative;
+    transition: .2s ease;
+    transform: scale(.8);
+}
+
+div.searchReplaceCloseIcon::before {
+    content: '';
+    top: calc(50% - 2px);
+    width: 100%;
+    height: 4px;
+    display: block;
+    position: relative;
+    box-sizing: border-box;
+    border-width: 0 0 4px 0;
+    border-style: solid;
+    border-color: #fafafa;
+    transition: .2s ease;
+    transform: rotate(45deg);
+}
+
+div.searchReplaceCloseIcon::after {
+    content: '';
+    top: -4px;
+    left: calc(50% - 2px);
+    width: 4px;
+    height: 100%;
+    display: block;
+    position: relative;
+    box-sizing: border-box;
+    border-width: 0 4px 0 0;
+    border-style: solid;
+    border-color: #fafafa;
+    transition: .2s ease;
+    transform: rotate(45deg);
+}
+
+div#closeDialogIcon {
+  width: 28px;
+  height: 28px;
+}
+
+div#closeDialogIcon:hover > div.searchReplaceCloseIcon {
+  transform: scale(1);
+}
+
+div#closeDialogIcon:hover > div.searchReplaceCloseIcon::before,
+div#closeDialogIcon:hover > div.searchReplaceCloseIcon::after {
+  border-color: orange;
+}
+
+</style>
