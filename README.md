@@ -2,10 +2,10 @@
 This is a Google Apps Script code editor that connects directly to your Google drive for loading and saving files. It creates
 unique query strings for each file, allowing files to be saved and opened as bookmarks.
 
-This tool uses the CodeMirror library for the actual editor portion, providing the markup and editing functions of the editor. I've 
+This tool uses the CodeMirror library for the actual editor portion, providing the syntax highlighting and editing functions of the editor. I've 
 created a custom search plugin for CodeMirror to make the search UI more user friendly. 
 
-This is very much a WYSIWYG editor. It currently provides markup support for:
+This is very much a WYSIWYG editor. It currently provides syntax highlighting support for:
 - HTML
 - CSS
 - JS
